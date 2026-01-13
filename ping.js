@@ -35,6 +35,13 @@ async function ping(db){
   console.log(`${db.name}:`, text);
 }
 
-for(const db of databases){
-  await ping(db);
+async function main() {
+  for(const db of databases){
+    await ping(db);
+  }
 }
+
+main().catch(err => {
+  console.error("Error:", err);
+  process.exit(1);
+});
