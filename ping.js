@@ -36,6 +36,12 @@ async function keepAlive(db) {
   console.log(`✅ ${db.name} touched`);
 }
 
-for (const db of databases) {
-  await keepAlive(db);
+async function main(){
+  for (const db of databases) {
+    await keepAlive(db);
+  }
 }
+
+main();
+
+
