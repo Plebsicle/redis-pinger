@@ -16,32 +16,26 @@ const databases = [
   }
 ];
 
-async function ping(db){
-  if(!db.url || !db.token){
-    console.error(`Missing env for ${db.name}`);
-    process.exit(1);
-  }
-
-  const res = await fetch(db.url,{
+async function command(db, cmd) {
+  return fetch(db.url, {
     method: "POST",
     headers: {
-      "Authorization": `Bearer ${db.token}`,
+      Authorization: `Bearer ${db.token}`,
       "Content-Type": "application/json"
     },
-    body: JSON.stringify(["PING"])
+    body: JSON.stringify(cmd)
   });
-
-  const text = await res.text();
-  console.log(`${db.name}:`, text);
 }
 
-async function main() {
-  for(const db of databases){
-    await ping(db);
-  }
+async function keepAlive(db) {
+  const key = "__keepalive__";
+
+  await command(db, ["SET", key, Date.now()]);
+  await command(db, ["GET", key]);
+
+  console.log(`✅ ${db.name} touched`);
 }
 
-main().catch(err => {
-  console.error("Error:", err);
-  process.exit(1);
-});
+for (const db of databases) {
+  await keepAlive(db);
+}
